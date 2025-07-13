@@ -4,9 +4,6 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Fretboard Memorizer</title>
-
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;700&display=swap" rel="stylesheet" />
-
   <style>
     *, *::before, *::after {
       box-sizing: border-box;
@@ -14,26 +11,22 @@
     html, body {
       height: 100%;
       margin: 0;
-      font-family: 'Poppins', sans-serif;
+      font-family: Helvetica, Arial, sans-serif;
       background-color: #121212;
       color: #f0f0f0;
       user-select: none;
-      -webkit-font-smoothing: antialiased;
-      -moz-osx-font-smoothing: grayscale;
-    }
-    body {
       display: flex;
       flex-direction: column;
       align-items: center;
       padding: 20px;
     }
     h1 {
-      font-weight: 700;
-      font-size: 1.5rem; /* smaller title */
-      background-color: #000000;
-      color: #ffffff;
+      font-weight: bold;
+      font-size: 1.5rem;
+      background-color: #000;
+      color: #fff;
       padding: 10px 20px;
-      border: 2px solid #ffffff;
+      border: 2px solid #fff;
       border-radius: 16px;
       margin: 0 0 24px 0;
       text-align: center;
@@ -44,82 +37,61 @@
       align-items: center;
       width: 100%;
       max-width: 480px;
+      border: 1px solid #333;
+      border-radius: 12px;
+      padding: 20px;
+      background-color: #1e1e1e;
+      box-shadow: 0 0 10px rgba(0,0,0,0.4);
     }
     #string, #note {
-      font-weight: 500;
       font-size: 1.5rem;
-      margin: 20px 0 8px 0;
-      min-height: 2em;
-      color: #ffffff;
-      letter-spacing: 0.05em;
-      user-select: text;
+      margin: 16px 0 8px 0;
       text-align: center;
     }
     #fretNumber {
-      font-weight: 600;
       font-size: 1.3rem;
       color: #d32f2f;
       margin-top: 8px;
       min-height: 1.6em;
-      user-select: text;
       text-align: center;
       font-family: monospace;
     }
     button {
-      margin-top: 32px;
-      padding: 14px 36px;
-      font-size: 1.6rem;
-      font-weight: 700;
-      color: #ffffff;
+      margin-top: 24px;
+      padding: 12px 28px;
+      font-size: 1.2rem;
+      font-weight: bold;
+      color: #fff;
       background-color: #d32f2f;
-      border: 2px solid #000000;
-      border-radius: 12px;
+      border: 2px solid #000;
+      border-radius: 10px;
       cursor: pointer;
-      transition: background-color 0.3s ease;
-      user-select: none;
-      min-width: 180px;
     }
-    button:hover,
-    button:focus {
-      background-color: #9a2222;
-      outline: none;
-    }
-    button:active {
-      background-color: #7a1b1b;
+    select, label {
+      margin-top: 16px;
+      font-size: 1rem;
     }
     select {
-      font-size: 1rem;
-      font-weight: 500;
-      padding: 6px 12px;
+      padding: 6px 10px;
       border-radius: 8px;
-      border: 2px solid #ffffff;
       background-color: #1e1e1e;
       color: #f0f0f0;
-      cursor: pointer;
-      margin-top: 20px;
-      min-width: 160px;
-      user-select: none;
-    }
-    label {
-      margin-top: 16px;
-      font-weight: 500;
-      font-size: 1rem;
-      user-select: none;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      cursor: pointer;
+      border: 2px solid #fff;
     }
     input[type="checkbox"] {
-      width: 18px;
-      height: 18px;
-      cursor: pointer;
+      margin-right: 8px;
+    }
+    .timer-controls {
+      margin-top: 32px;
+      border-top: 1px solid #444;
+      padding-top: 16px;
+      width: 100%;
+      text-align: center;
     }
   </style>
 </head>
 <body>
   <h1>Fretboard Memorizer</h1>
-
   <div class="main-container">
     <div id="string"></div>
     <div id="note"></div>
@@ -137,37 +109,34 @@
       <option value="High E String">High E String</option>
     </select>
 
-    <label>
-      <input type="checkbox" id="naturalOnly" />
-      Limit to natural notes only (A, B, C, D, E, F, G)
-    </label>
+    <label><input type="checkbox" id="naturalOnly"> Limit to natural notes only</label>
+    <label><input type="checkbox" id="showEnharmonic" checked> Show enharmonic equivalents</label>
+    <label><input type="checkbox" id="revealFretNumber"> Reveal fret number</label>
 
-    <label>
-      <input type="checkbox" id="showEnharmonic" checked />
-      Show enharmonic equivalents (e.g. A♯ / B♭)
-    </label>
-
-    <label>
-      <input type="checkbox" id="revealFretNumber" />
-      Reveal fret number
-    </label>
+    <div class="timer-controls">
+      <label><input type="checkbox" id="autoTimer"> Enable timed mode</label>
+      <br>
+      <label for="intervalSelect">Interval:</label>
+      <select id="intervalSelect">
+        <option value="1000">1 second</option>
+        <option value="3000">3 seconds</option>
+        <option value="5000">5 seconds</option>
+        <option value="10000">10 seconds</option>
+      </select>
+    </div>
   </div>
 
   <script>
-    const strings = [
-      "Low E String", "A String", "D String",
-      "G String", "B String", "High E String"
-    ];
-    const allNotes = [
-      "A", "A♯ / B♭", "B", "C", "C♯ / D♭", "D",
-      "D♯ / E♭", "E", "F", "F♯ / G♭", "G", "G♯ / A♭"
-    ];
+    const strings = ["Low E String", "A String", "D String", "G String", "B String", "High E String"];
+    const allNotes = ["A", "A♯ / B♭", "B", "C", "C♯ / D♭", "D", "D♯ / E♭", "E", "F", "F♯ / G♭", "G", "G♯ / A♭"];
     const naturalNotes = ["A", "B", "C", "D", "E", "F", "G"];
     const tuningNotes = {
       "Low E String": "E", "A String": "A", "D String": "D",
       "G String": "G", "B String": "B", "High E String": "E"
     };
     const chromaticNotes = [...allNotes];
+
+    let timer = null;
 
     function baseNoteName(note) {
       return note.split(" / ")[0];
@@ -183,7 +152,6 @@
       const targetIndex = noteIndex(baseNoteName(noteToFind));
       let frets = [];
       if (openIndex === -1 || targetIndex === -1) return frets;
-
       for (let fret = 0; fret <= 12; fret++) {
         const noteAtFret = chromaticNotes[(openIndex + fret) % 12];
         if (baseNoteName(noteAtFret) === baseNoteName(noteToFind)) {
@@ -198,10 +166,9 @@
       const naturalOnly = document.getElementById("naturalOnly").checked;
       const showEnharmonic = document.getElementById("showEnharmonic").checked;
       const revealFretNumberCheckbox = document.getElementById("revealFretNumber");
-
       const selectedString = stringSelect.value;
-      let notePool = naturalOnly ? naturalNotes : allNotes;
 
+      const notePool = naturalOnly ? naturalNotes : allNotes;
       let randomNote = notePool[Math.floor(Math.random() * notePool.length)];
       if (!showEnharmonic && randomNote.includes(" / ")) {
         randomNote = baseNoteName(randomNote);
@@ -213,28 +180,40 @@
 
       document.getElementById("string").innerText = chosenString;
       document.getElementById("note").innerText = randomNote;
-
-      revealFretNumberCheckbox.checked = false;
       document.getElementById("fretNumber").innerText = "";
+      revealFretNumberCheckbox.checked = false;
     }
 
     document.getElementById('revealFretNumber').addEventListener('change', () => {
-      const revealFretNumber = document.getElementById('revealFretNumber').checked;
-      const fretNumberDiv = document.getElementById('fretNumber');
-
+      const reveal = document.getElementById('revealFretNumber').checked;
       const currentString = document.getElementById('string').innerText;
       const currentNote = document.getElementById('note').innerText;
+      const output = document.getElementById('fretNumber');
 
-      if (!currentString || !currentNote) {
-        fretNumberDiv.innerText = '';
-        return;
-      }
-
-      if (revealFretNumber) {
+      if (reveal) {
         const frets = getFretsForNote(currentString, currentNote);
-        fretNumberDiv.innerText = frets.length ? frets.join(', ') : 'Fret number not found';
+        output.innerText = frets.length ? frets.join(', ') : 'Fret number not found';
       } else {
-        fretNumberDiv.innerText = '';
+        output.innerText = '';
+      }
+    });
+
+    document.getElementById('autoTimer').addEventListener('change', () => {
+      const enabled = document.getElementById('autoTimer').checked;
+      const interval = parseInt(document.getElementById('intervalSelect').value, 10);
+      if (enabled) {
+        generateRandom();
+        timer = setInterval(generateRandom, interval);
+      } else {
+        clearInterval(timer);
+      }
+    });
+
+    document.getElementById('intervalSelect').addEventListener('change', () => {
+      if (document.getElementById('autoTimer').checked) {
+        clearInterval(timer);
+        const newInterval = parseInt(document.getElementById('intervalSelect').value, 10);
+        timer = setInterval(generateRandom, newInterval);
       }
     });
 
