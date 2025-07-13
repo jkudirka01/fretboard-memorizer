@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Fretboard Memorizer</title>
 
-  <!-- Google Fonts: Poppins -->
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;700&display=swap" rel="stylesheet" />
 
   <style>
@@ -30,16 +29,14 @@
     }
     h1 {
       font-weight: 700;
-      font-size: 2.5rem;
+      font-size: 1.5rem; /* smaller title */
       background-color: #000000;
       color: #ffffff;
-      padding: 24px 48px;
+      padding: 10px 20px;
       border: 2px solid #ffffff;
       border-radius: 16px;
-      margin: 0 0 40px 0;
-      align-self: flex-start;
-      max-width: 100%;
-      word-wrap: break-word;
+      margin: 0 0 24px 0;
+      text-align: center;
     }
     .main-container {
       display: flex;
@@ -50,7 +47,7 @@
     }
     #string, #note {
       font-weight: 500;
-      font-size: 1.8rem;
+      font-size: 1.5rem;
       margin: 20px 0 8px 0;
       min-height: 2em;
       color: #ffffff;
@@ -60,7 +57,7 @@
     }
     #fretNumber {
       font-weight: 600;
-      font-size: 1.4rem;
+      font-size: 1.3rem;
       color: #d32f2f;
       margin-top: 8px;
       min-height: 1.6em;
@@ -71,7 +68,7 @@
     button {
       margin-top: 32px;
       padding: 14px 36px;
-      font-size: 1.8rem;
+      font-size: 1.6rem;
       font-weight: 700;
       color: #ffffff;
       background-color: #d32f2f;
@@ -91,7 +88,7 @@
       background-color: #7a1b1b;
     }
     select {
-      font-size: 1.2rem;
+      font-size: 1rem;
       font-weight: 500;
       padding: 6px 12px;
       border-radius: 8px;
@@ -103,15 +100,10 @@
       min-width: 160px;
       user-select: none;
     }
-    select:focus {
-      outline: none;
-      border-color: #bb86fc;
-      background-color: #2c2c2c;
-    }
     label {
       margin-top: 16px;
       font-weight: 500;
-      font-size: 1.2rem;
+      font-size: 1rem;
       user-select: none;
       display: flex;
       align-items: center;
@@ -129,13 +121,13 @@
   <h1>Fretboard Memorizer</h1>
 
   <div class="main-container">
-    <div id="string" aria-live="polite" aria-atomic="true"></div>
-    <div id="note" aria-live="polite" aria-atomic="true"></div>
-    <div id="fretNumber" aria-live="polite" aria-atomic="true"></div>
+    <div id="string"></div>
+    <div id="note"></div>
+    <div id="fretNumber"></div>
 
-    <button onclick="generateRandom()" aria-label="Generate new note">NEW NOTE</button>
+    <button onclick="generateRandom()">NEW NOTE</button>
 
-    <select id="stringSelect" aria-label="Select guitar string">
+    <select id="stringSelect">
       <option value="random">Random String</option>
       <option value="Low E String">Low E String</option>
       <option value="A String">A String</option>
@@ -163,36 +155,20 @@
 
   <script>
     const strings = [
-      "Low E String",
-      "A String",
-      "D String",
-      "G String",
-      "B String",
-      "High E String"
+      "Low E String", "A String", "D String",
+      "G String", "B String", "High E String"
     ];
-
     const allNotes = [
       "A", "A♯ / B♭", "B", "C", "C♯ / D♭", "D",
       "D♯ / E♭", "E", "F", "F♯ / G♭", "G", "G♯ / A♭"
     ];
-
     const naturalNotes = ["A", "B", "C", "D", "E", "F", "G"];
-
     const tuningNotes = {
-      "Low E String": "E",
-      "A String": "A",
-      "D String": "D",
-      "G String": "G",
-      "B String": "B",
-      "High E String": "E"
+      "Low E String": "E", "A String": "A", "D String": "D",
+      "G String": "G", "B String": "B", "High E String": "E"
     };
+    const chromaticNotes = [...allNotes];
 
-    const chromaticNotes = [
-      "A", "A♯ / B♭", "B", "C", "C♯ / D♭", "D",
-      "D♯ / E♭", "E", "F", "F♯ / G♭", "G", "G♯ / A♭"
-    ];
-
-    // Helper to get the base note (before any slash)
     function baseNoteName(note) {
       return note.split(" / ")[0];
     }
@@ -224,12 +200,11 @@
       const revealFretNumberCheckbox = document.getElementById("revealFretNumber");
 
       const selectedString = stringSelect.value;
-
       let notePool = naturalOnly ? naturalNotes : allNotes;
 
       let randomNote = notePool[Math.floor(Math.random() * notePool.length)];
       if (!showEnharmonic && randomNote.includes(" / ")) {
-        randomNote = randomNote.split(" / ")[0];
+        randomNote = baseNoteName(randomNote);
       }
 
       const chosenString = selectedString === "random"
@@ -239,12 +214,10 @@
       document.getElementById("string").innerText = chosenString;
       document.getElementById("note").innerText = randomNote;
 
-      // Reset reveal fret number checkbox and clear fret display on new note
       revealFretNumberCheckbox.checked = false;
       document.getElementById("fretNumber").innerText = "";
     }
 
-    // Update fret number immediately when Reveal fret number checkbox changes
     document.getElementById('revealFretNumber').addEventListener('change', () => {
       const revealFretNumber = document.getElementById('revealFretNumber').checked;
       const fretNumberDiv = document.getElementById('fretNumber');
@@ -265,7 +238,6 @@
       }
     });
 
-    // Spacebar triggers NEW NOTE
     document.body.addEventListener('keydown', e => {
       if (e.code === 'Space' && !['INPUT', 'SELECT', 'TEXTAREA'].includes(e.target.tagName)) {
         e.preventDefault();
